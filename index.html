@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hiragana Land</title>
+  <title>Hiragana Land Advanced</title>
   
-  <!-- Tailwind CSS（デザインを整えるツール）の読み込み -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- Reactをブラウザで動かすための翻訳ツール（Babel）の読み込み -->
+  <!-- Babel -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   
-  <!-- Reactやアイコンをインターネットから取得するための設定 -->
+  <!-- Import Map -->
   <script type="importmap">
     {
       "imports": {
@@ -23,17 +23,15 @@
   </script>
 </head>
 <body>
-  <!-- アプリが表示される場所 -->
   <div id="root"></div>
 
-  <!-- ここから下が変換したReactのコードです -->
   <script type="text/babel" data-type="module">
     import React, { useState, useEffect, useCallback } from 'react';
     import { createRoot } from 'react-dom/client';
-    import { Play, Home, Volume2, Award, Star, ArrowLeft, Check, X, Download } from 'lucide-react';
+    import { Play, Home, Volume2, Award, Star, ArrowLeft, Check, X, Download, Settings } from 'lucide-react';
 
-    // ひらがなデータ（空白はグリッドのレイアウト調整用）
-    const HIRAGANA_DATA = [
+    // --- ひらがなデータ ---
+    const SEION_DATA = [
       { kana: 'あ', romaji: 'a' }, { kana: 'い', romaji: 'i' }, { kana: 'う', romaji: 'u' }, { kana: 'え', romaji: 'e' }, { kana: 'お', romaji: 'o' },
       { kana: 'か', romaji: 'ka' }, { kana: 'き', romaji: 'ki' }, { kana: 'く', romaji: 'ku' }, { kana: 'け', romaji: 'ke' }, { kana: 'こ', romaji: 'ko' },
       { kana: 'さ', romaji: 'sa' }, { kana: 'し', romaji: 'shi' }, { kana: 'す', romaji: 'su' }, { kana: 'せ', romaji: 'se' }, { kana: 'そ', romaji: 'so' },
@@ -47,9 +45,35 @@
       { kana: 'ん', romaji: 'n' }, { kana: '', romaji: '' }, { kana: '', romaji: '' }, { kana: '', romaji: '' }, { kana: '', romaji: '' }
     ];
 
-    const VALID_KANA = HIRAGANA_DATA.filter(item => item.kana !== '');
+    const DAKUON_DATA = [
+      { kana: 'が', romaji: 'ga' }, { kana: 'ぎ', romaji: 'gi' }, { kana: 'ぐ', romaji: 'gu' }, { kana: 'げ', romaji: 'ge' }, { kana: 'ご', romaji: 'go' },
+      { kana: 'ざ', romaji: 'za' }, { kana: 'じ', romaji: 'ji' }, { kana: 'ず', romaji: 'zu' }, { kana: 'ぜ', romaji: 'ze' }, { kana: 'ぞ', romaji: 'zo' },
+      { kana: 'だ', romaji: 'da' }, { kana: 'ぢ', romaji: 'ji' }, { kana: 'づ', romaji: 'zu' }, { kana: 'で', romaji: 'de' }, { kana: 'ど', romaji: 'do' },
+      { kana: 'ば', romaji: 'ba' }, { kana: 'び', romaji: 'bi' }, { kana: 'ぶ', romaji: 'bu' }, { kana: 'べ', romaji: 'be' }, { kana: 'ぼ', romaji: 'bo' },
+      { kana: 'ぱ', romaji: 'pa' }, { kana: 'ぴ', romaji: 'pi' }, { kana: 'ぷ', romaji: 'pu' }, { kana: 'ぺ', romaji: 'pe' }, { kana: 'ぽ', romaji: 'po' }
+    ];
 
-    // 配列をシャッフルするユーティリティ関数
+    const YOON_DATA = [
+      { kana: 'きゃ', romaji: 'kya' }, { kana: 'きゅ', romaji: 'kyu' }, { kana: 'きょ', romaji: 'kyo' },
+      { kana: 'しゃ', romaji: 'sha' }, { kana: 'しゅ', romaji: 'shu' }, { kana: 'しょ', romaji: 'sho' },
+      { kana: 'ちゃ', romaji: 'cha' }, { kana: 'ちゅ', romaji: 'chu' }, { kana: 'ちょ', romaji: 'cho' },
+      { kana: 'にゃ', romaji: 'nya' }, { kana: 'にゅ', romaji: 'nyu' }, { kana: 'にょ', romaji: 'nyo' },
+      { kana: 'ひゃ', romaji: 'hya' }, { kana: 'ひゅ', romaji: 'hyu' }, { kana: 'ひょ', romaji: 'hyo' },
+      { kana: 'みゃ', romaji: 'mya' }, { kana: 'みゅ', romaji: 'myu' }, { kana: 'みょ', romaji: 'myo' },
+      { kana: 'りゃ', romaji: 'rya' }, { kana: 'りゅ', romaji: 'ryu' }, { kana: 'りょ', romaji: 'ryo' },
+      { kana: 'ぎゃ', romaji: 'gya' }, { kana: 'ぎゅ', romaji: 'gyu' }, { kana: 'ぎょ', romaji: 'gyo' },
+      { kana: 'じゃ', romaji: 'ja' }, { kana: 'じゅ', romaji: 'ju' }, { kana: 'じょ', romaji: 'jo' },
+      { kana: 'びゃ', romaji: 'bya' }, { kana: 'びゅ', romaji: 'byu' }, { kana: 'びょ', romaji: 'byo' },
+      { kana: 'ぴゃ', romaji: 'pya' }, { kana: 'ぴゅ', romaji: 'pyu' }, { kana: 'ぴょ', romaji: 'pyo' }
+    ];
+
+    const ALL_VALID_KANA = [
+      ...SEION_DATA.filter(item => item.kana !== ''),
+      ...DAKUON_DATA,
+      ...YOON_DATA
+    ];
+
+    // 配列をシャッフル
     const shuffleArray = (array) => {
       const newArr = [...array];
       for (let i = newArr.length - 1; i > 0; i--) {
@@ -59,17 +83,65 @@
       return newArr;
     };
 
+    const playSE = (type) => {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      const ctx = new AudioContext();
+      
+      if (type === 'correct') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.frequency.setValueAtTime(783.99, ctx.currentTime);
+        osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.25);
+        
+        gain.gain.setValueAtTime(0, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.05);
+        gain.gain.setValueAtTime(0.5, ctx.currentTime + 0.2);
+        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.24);
+        gain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.26);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
+
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.8);
+      } else if (type === 'incorrect') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'square';
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.frequency.setValueAtTime(150, ctx.currentTime);
+        
+        gain.gain.setValueAtTime(0, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.02);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime + 0.15);
+        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.17);
+        
+        gain.gain.setValueAtTime(0, ctx.currentTime + 0.2);
+        gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.22);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime + 0.5);
+        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.55);
+
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.6);
+      }
+    };
+
     function App() {
       const [currentView, setCurrentView] = useState('home'); // 'home', 'table', 'quiz', 'certificate'
       const [score, setScore] = useState(0);
       const [userName, setUserName] = useState('');
+      const [quizScope, setQuizScope] = useState('level1'); // 'level1', 'level2', 'level3'
+      const [currentTab, setCurrentTab] = useState('seion'); // 表画面でのタブ切り替え用
       
-      // クイズ用の状態
       const [currentQuestion, setCurrentQuestion] = useState(null);
       const [options, setOptions] = useState([]);
-      const [feedback, setFeedback] = useState(null); // 'correct', 'incorrect', null
+      const [feedback, setFeedback] = useState(null); 
 
-      // 音声リストをあらかじめ読み込んでおく（Chrome等の非同期読み込み対策）
       useEffect(() => {
         if ('speechSynthesis' in window) {
           window.speechSynthesis.getVoices();
@@ -79,42 +151,35 @@
         }
       }, []);
 
-      // Web Speech API を使った音声読み上げ
       const playSound = useCallback((text) => {
         if ('speechSynthesis' in window) {
-          // 再生中の音声をキャンセル
           window.speechSynthesis.cancel();
           const msg = new SpeechSynthesisUtterance(text);
           msg.lang = 'ja-JP';
-          msg.rate = 0.8; // 少しゆっくり発音
+          msg.rate = 0.8; 
 
-          // 利用可能な音声リストを取得
           const voices = window.speechSynthesis.getVoices();
-          
-          // Googleの日本語音声（高音質）を優先して探す
           const googleJaVoice = voices.find(v => v.lang.includes('ja') && v.name.toLowerCase().includes('google'));
-          // なければその他の日本語音声を探す
           const anyJaVoice = voices.find(v => v.lang.includes('ja'));
 
-          if (googleJaVoice) {
-            msg.voice = googleJaVoice;
-          } else if (anyJaVoice) {
-            msg.voice = anyJaVoice;
-          }
+          if (googleJaVoice) msg.voice = googleJaVoice;
+          else if (anyJaVoice) msg.voice = anyJaVoice;
 
           window.speechSynthesis.speak(msg);
         }
       }, []);
 
-      // 新しいクイズを生成する
-      const generateQuiz = useCallback(() => {
-        // 正解をランダムに選ぶ
-        const correctAnswer = VALID_KANA[Math.floor(Math.random() * VALID_KANA.length)];
+      const generateQuiz = useCallback((scopeStr) => {
+        let targetPool = ALL_VALID_KANA;
+        if (scopeStr === 'level1') targetPool = SEION_DATA.filter(k => k.kana !== '');
+        if (scopeStr === 'level2') targetPool = [...DAKUON_DATA, ...YOON_DATA];
+        if (scopeStr === 'level3') targetPool = ALL_VALID_KANA;
+
+        const correctAnswer = targetPool[Math.floor(Math.random() * targetPool.length)];
         
-        // 不正解の選択肢を3つ選ぶ
         let wrongAnswers = [];
         while (wrongAnswers.length < 3) {
-          const randomKana = VALID_KANA[Math.floor(Math.random() * VALID_KANA.length)];
+          const randomKana = targetPool[Math.floor(Math.random() * targetPool.length)];
           if (randomKana.kana !== correctAnswer.kana && !wrongAnswers.some(w => w.kana === randomKana.kana)) {
             wrongAnswers.push(randomKana);
           }
@@ -125,59 +190,50 @@
         setOptions(allOptions);
         setFeedback(null);
         
-        // クイズ生成時に音声を鳴らす
         playSound(correctAnswer.kana);
       }, [playSound]);
 
-      // クイズ開始
       const startQuiz = () => {
         setScore(0);
         setCurrentView('quiz');
-        generateQuiz();
+        generateQuiz(quizScope);
       };
 
-      // 回答を選択した時の処理
       const handleAnswer = (selectedKana) => {
-        if (feedback !== null) return; // 既に回答済みの場合は無視
+        if (feedback !== null) return; 
 
         if (selectedKana.kana === currentQuestion.kana) {
           setFeedback('correct');
           const newScore = score + 10;
           setScore(newScore);
-          playSound('せいかい');
+          playSE('correct');
 
-          // 100点に到達したら修了証画面へ遷移
           if (newScore >= 100) {
             setTimeout(() => {
               setCurrentView('certificate');
             }, 1500);
-            return; // 次のクイズは生成しない
+            return; 
           }
         } else {
           setFeedback('incorrect');
-          // 不正解の場合は10点マイナス（ただし0点未満にはならないようにする）
           setScore(s => Math.max(0, s - 10));
-          playSound('ざんねん');
+          playSE('incorrect');
         }
 
-        // 1.5秒後に次の問題へ
         setTimeout(() => {
-          generateQuiz();
+          generateQuiz(quizScope);
         }, 1500);
       };
 
-      // 修了証を画像としてダウンロードする処理
       const downloadCertificate = () => {
         const canvas = document.createElement('canvas');
         canvas.width = 800;
         canvas.height = 600;
         const ctx = canvas.getContext('2d');
 
-        // 背景を塗る
-        ctx.fillStyle = '#fdf2f8'; // ピンクの薄い背景
+        ctx.fillStyle = '#fdf2f8';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // 枠線を描く
         ctx.strokeStyle = '#fbcfe8';
         ctx.lineWidth = 20;
         ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
@@ -185,48 +241,53 @@
         ctx.lineWidth = 4;
         ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
 
-        // テキストを描く
-        ctx.fillStyle = '#db2777'; // 濃いピンク
+        ctx.fillStyle = '#db2777';
         ctx.font = 'bold 50px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('Certificate of Achievement', canvas.width / 2, 120);
 
-        ctx.fillStyle = '#374151'; // ダークグレー
+        ctx.fillStyle = '#374151';
         ctx.font = '30px sans-serif';
         ctx.fillText('This certifies that', canvas.width / 2, 220);
 
-        // ユーザー名
-        ctx.fillStyle = '#2563eb'; // 青
+        ctx.fillStyle = '#2563eb';
         ctx.font = 'bold 60px sans-serif';
         ctx.fillText(userName || 'Student', canvas.width / 2, 310);
 
         ctx.fillStyle = '#374151';
         ctx.font = '30px sans-serif';
-        ctx.fillText('has successfully mastered the Hiragana Quiz', canvas.width / 2, 400);
-        ctx.fillText('with a perfect score of 100 points!', canvas.width / 2, 450);
+        ctx.fillText('has successfully mastered the Advanced Quiz', canvas.width / 2, 400);
+        
+        // クイズのスコープに応じたテキスト
+        const scopeText = quizScope === 'level3' ? 'Level 3 (Mixed)' 
+                        : quizScope === 'level2' ? 'Level 2 (Advanced)' 
+                        : 'Level 1 (Basic)';
+        
+        ctx.fillStyle = '#f59e0b';
+        ctx.font = 'bold 28px sans-serif';
+        ctx.fillText(`Category: ${scopeText}`, canvas.width / 2, 450);
 
-        // 日付
         const date = new Date().toLocaleDateString();
-        ctx.fillStyle = '#6b7280'; // グレー
+        ctx.fillStyle = '#6b7280';
         ctx.font = '24px sans-serif';
         ctx.fillText(`Date: ${date}`, canvas.width / 2, 540);
 
-        // ダウンロードの実行
         const url = canvas.toDataURL('image/png');
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${userName || 'Student'}_Hiragana_Certificate.png`;
+        a.download = `${userName || 'Student'}_Hiragana_Advanced_Certificate.png`;
         a.click();
       };
 
-      // --- コンポーネント: ホーム画面 ---
+      // --- Views ---
+      
       const renderHomeView = () => (
         <div className="flex flex-col items-center justify-center h-full space-y-8 p-6 text-center animate-in fade-in zoom-in duration-500">
-          <div className="bg-white/80 p-8 rounded-3xl shadow-xl backdrop-blur-sm border-4 border-yellow-300 w-full max-w-md">
-            <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-500 mb-4 tracking-wider">
-              Hiragana<br/>Land
+          <div className="bg-white/90 p-8 rounded-3xl shadow-xl backdrop-blur-sm border-4 border-purple-300 w-full max-w-md">
+            <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500 mb-4 tracking-wider">
+              Hiragana<br/>Advanced
             </h1>
-            <p className="text-gray-600 font-medium mb-8">Master Hiragana while having fun!</p>
+            <p className="text-gray-600 font-medium mb-6">Master Voiced & Contracted sounds!</p>
             
             <div className="flex flex-col gap-4 w-full mx-auto">
               <input 
@@ -234,73 +295,114 @@
                 placeholder="Enter your name" 
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
-                className="w-full text-center text-xl p-4 border-2 border-pink-200 rounded-2xl focus:outline-none focus:border-pink-500 transition shadow-inner mb-2"
+                className="w-full text-center text-xl p-4 border-2 border-purple-200 rounded-2xl focus:outline-none focus:border-purple-500 transition shadow-inner mb-2"
               />
 
               <button 
                 onClick={() => setCurrentView('table')}
-                className="flex items-center justify-center gap-3 bg-blue-400 hover:bg-blue-500 text-white text-xl font-bold py-4 px-6 rounded-2xl shadow-lg transform transition active:scale-95"
+                className="flex items-center justify-center gap-3 bg-indigo-400 hover:bg-indigo-500 text-white text-xl font-bold py-4 px-6 rounded-2xl shadow-lg transform transition active:scale-95"
               >
                 <Home size={28} />
-                Hiragana Chart
+                Full Chart
+              </button>
+
+              <div className="bg-purple-50 p-4 rounded-2xl border border-purple-100 mt-2">
+                <div className="flex items-center justify-center gap-2 text-purple-600 mb-2 font-bold">
+                  <Settings size={18} /> Quiz Mode
+                </div>
+                <select
+                  value={quizScope}
+                  onChange={(e) => setQuizScope(e.target.value)}
+                  className="w-full text-center text-lg p-3 border-2 border-purple-200 rounded-xl focus:outline-none mb-4 bg-white text-gray-700 font-medium"
+                >
+                  <option value="level1">Level 1 (Basic)</option>
+                  <option value="level2">Level 2 (Advanced)</option>
+                  <option value="level3">Level 3 (Mixed)</option>
+                </select>
+
+                <button 
+                  onClick={startQuiz}
+                  disabled={!userName.trim()}
+                  className={`w-full flex items-center justify-center gap-3 text-white text-xl font-bold py-4 px-6 rounded-xl shadow-lg transform transition ${!userName.trim() ? 'bg-gray-300 cursor-not-allowed' : 'bg-pink-500 hover:bg-pink-600 active:scale-95'}`}
+                >
+                  <Play size={28} />
+                  Start Quiz
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+
+      const renderTableView = () => {
+        const currentData = currentTab === 'seion' ? SEION_DATA : currentTab === 'dakuon' ? DAKUON_DATA : YOON_DATA;
+        const gridCols = currentTab === 'yoon' ? 'grid-cols-3' : 'grid-cols-5';
+
+        return (
+          <div className="flex flex-col h-full bg-white/95 rounded-3xl shadow-xl p-4 md:p-8 animate-in slide-in-from-right duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <button 
+                onClick={() => setCurrentView('home')}
+                className="flex items-center gap-2 text-gray-500 hover:text-gray-800 transition font-bold bg-gray-100 py-2 px-4 rounded-full"
+              >
+                <ArrowLeft size={20} /> Back
+              </button>
+              <h2 className="text-2xl font-bold text-indigo-600 hidden md:block">Hiragana Chart</h2>
+              <div className="w-24"></div>
+            </div>
+
+            {/* タブ切り替えボタン */}
+            <div className="flex flex-wrap gap-2 justify-center mb-6">
+              <button 
+                onClick={() => setCurrentTab('seion')}
+                className={`py-2 px-4 md:px-6 rounded-full font-bold transition text-sm md:text-base shadow-sm ${currentTab === 'seion' ? 'bg-indigo-500 text-white' : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100'}`}
+              >
+                Basic
               </button>
               <button 
-                onClick={startQuiz}
-                disabled={!userName.trim()}
-                className={`flex items-center justify-center gap-3 text-white text-xl font-bold py-4 px-6 rounded-2xl shadow-lg transform transition ${!userName.trim() ? 'bg-gray-300 cursor-not-allowed' : 'bg-pink-400 hover:bg-pink-500 active:scale-95'}`}
+                onClick={() => setCurrentTab('dakuon')}
+                className={`py-2 px-4 md:px-6 rounded-full font-bold transition text-sm md:text-base shadow-sm ${currentTab === 'dakuon' ? 'bg-indigo-500 text-white' : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100'}`}
               >
-                <Play size={28} />
-                Play Quiz
+                Voiced
+              </button>
+              <button 
+                onClick={() => setCurrentTab('yoon')}
+                className={`py-2 px-4 md:px-6 rounded-full font-bold transition text-sm md:text-base shadow-sm ${currentTab === 'yoon' ? 'bg-indigo-500 text-white' : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100'}`}
+              >
+                Contracted
               </button>
             </div>
-          </div>
-        </div>
-      );
 
-      // --- コンポーネント: ひらがな表画面 ---
-      const renderTableView = () => (
-        <div className="flex flex-col h-full bg-white/90 rounded-3xl shadow-xl p-4 md:p-8 animate-in slide-in-from-right duration-300">
-          <div className="flex items-center justify-between mb-6">
-            <button 
-              onClick={() => setCurrentView('home')}
-              className="flex items-center gap-2 text-gray-500 hover:text-gray-800 transition font-bold bg-gray-100 py-2 px-4 rounded-full"
-            >
-              <ArrowLeft size={20} /> Back
-            </button>
-            <h2 className="text-2xl md:text-3xl font-bold text-blue-600">Hiragana Chart</h2>
-            <div className="w-24"></div>
-          </div>
-
-          <div className="flex-1 overflow-y-auto pb-4">
-            <div className="grid grid-cols-5 gap-2 md:gap-4 max-w-2xl mx-auto">
-              {HIRAGANA_DATA.map((item, index) => (
-                <div key={index} className="aspect-square">
-                  {item.kana ? (
-                    <button
-                      onClick={() => playSound(item.kana)}
-                      className="w-full h-full flex flex-col items-center justify-center bg-white border-2 border-blue-200 rounded-xl md:rounded-2xl shadow-sm hover:shadow-md hover:border-blue-400 hover:-translate-y-1 transition group"
-                    >
-                      <span className="text-3xl md:text-5xl font-bold text-gray-800 group-active:text-blue-500 transition-colors kyokasho-font">
-                        {item.kana}
-                      </span>
-                      <span className="text-xs md:text-sm text-gray-400 mt-1 font-medium">
-                        {item.romaji}
-                      </span>
-                    </button>
-                  ) : (
-                    <div className="w-full h-full"></div>
-                  )}
-                </div>
-              ))}
+            <div className="flex-1 overflow-y-auto pb-4">
+              <div className={`grid ${gridCols} gap-2 md:gap-4 max-w-2xl mx-auto`}>
+                {currentData.map((item, index) => (
+                  <div key={index} className={currentTab === 'yoon' ? "aspect-[4/3]" : "aspect-square"}>
+                    {item.kana ? (
+                      <button
+                        onClick={() => playSound(item.kana)}
+                        className="w-full h-full flex flex-col items-center justify-center bg-white border-2 border-indigo-100 rounded-xl md:rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-400 hover:-translate-y-1 transition group"
+                      >
+                        <span className={`font-bold text-gray-800 group-active:text-indigo-500 transition-colors kyokasho-font ${item.kana.length > 1 ? 'text-2xl md:text-4xl tracking-tighter' : 'text-3xl md:text-5xl'}`}>
+                          {item.kana}
+                        </span>
+                        <span className="text-xs md:text-sm text-gray-400 mt-1 font-medium">
+                          {item.romaji}
+                        </span>
+                      </button>
+                    ) : (
+                      <div className="w-full h-full"></div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      );
+        );
+      };
 
-      // --- コンポーネント: クイズ画面 ---
       const renderQuizView = () => (
         <div className="flex flex-col items-center justify-center p-2 md:p-4 animate-in zoom-in duration-300 w-full">
-          <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl p-6 md:p-8 border-4 border-pink-200 relative overflow-hidden">
+          <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl p-6 md:p-8 border-4 border-indigo-200 relative overflow-hidden">
             
             <div className="flex items-center justify-between mb-6 md:mb-8">
               <button 
@@ -321,7 +423,7 @@
                 
                 <button 
                   onClick={() => playSound(currentQuestion.kana)}
-                  className="w-20 h-20 md:w-24 md:h-24 bg-blue-100 hover:bg-blue-200 text-blue-500 rounded-full flex items-center justify-center shadow-inner mb-6 md:mb-8 transition active:scale-90"
+                  className="w-20 h-20 md:w-24 md:h-24 bg-indigo-100 hover:bg-indigo-200 text-indigo-500 rounded-full flex items-center justify-center shadow-inner mb-6 md:mb-8 transition active:scale-90"
                 >
                   <Volume2 size={40} className="md:w-12 md:h-12" />
                 </button>
@@ -342,8 +444,11 @@
                         key={index}
                         onClick={() => handleAnswer(option)}
                         disabled={feedback !== null}
-                        className={`h-24 md:h-32 rounded-2xl text-4xl md:text-5xl font-bold flex items-center justify-center shadow-sm transition transform active:scale-95 kyokasho-font ${buttonStyle}`}
+                        className={`relative h-24 md:h-32 rounded-2xl font-bold flex items-center justify-center shadow-sm transition transform active:scale-95 kyokasho-font ${buttonStyle} ${option.kana.length > 1 ? 'text-3xl md:text-5xl tracking-tighter' : 'text-4xl md:text-6xl'}`}
                       >
+                        <div className="absolute top-2 left-3 md:top-3 md:left-4 text-xl md:text-2xl font-bold text-gray-400 font-sans opacity-70">
+                          {['a', 'b', 'c', 'd'][index]}
+                        </div>
                         {option.kana}
                       </button>
                     );
@@ -366,24 +471,23 @@
         </div>
       );
 
-      // --- コンポーネント: 修了証画面 ---
       const renderCertificateView = () => (
         <div className="flex flex-col items-center justify-center p-4 animate-in zoom-in duration-500 w-full">
-          <div className="bg-white p-8 md:p-12 rounded-3xl shadow-2xl border-8 border-pink-200 text-center max-w-2xl w-full relative overflow-hidden">
+          <div className="bg-white p-8 md:p-12 rounded-3xl shadow-2xl border-8 border-indigo-200 text-center max-w-2xl w-full relative overflow-hidden">
             
-            <div className="absolute top-0 left-0 w-full h-full bg-pink-50 opacity-50 pointer-events-none"></div>
+            <div className="absolute top-0 left-0 w-full h-full bg-indigo-50 opacity-50 pointer-events-none"></div>
 
             <div className="relative z-10 flex flex-col items-center">
               <Award size={80} className="text-pink-500 mb-6 drop-shadow-md" />
               <h2 className="text-3xl md:text-5xl font-extrabold text-pink-600 mb-4 uppercase tracking-widest">
                 Certificate
               </h2>
-              <p className="text-gray-600 text-lg md:text-xl mb-6">This certifies that</p>
-              <h3 className="text-4xl md:text-6xl font-bold text-blue-600 mb-6 border-b-4 border-blue-200 pb-2 px-8">
+              <p className="text-gray-600 text-lg md:text-xl mb-4">This certifies that</p>
+              <h3 className="text-4xl md:text-6xl font-bold text-indigo-600 mb-4 border-b-4 border-indigo-200 pb-2 px-8">
                 {userName}
               </h3>
               <p className="text-gray-700 text-lg md:text-xl mb-2">has successfully mastered the</p>
-              <p className="text-gray-700 text-xl md:text-2xl font-bold mb-8">Hiragana Quiz</p>
+              <p className="text-gray-700 text-xl md:text-2xl font-bold mb-8">Advanced Hiragana Quiz</p>
               
               <div className="flex flex-col md:flex-row gap-4">
                 <button 
@@ -410,7 +514,7 @@
       );
 
       return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 font-sans p-4 md:p-8 flex flex-col">
+        <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 font-sans p-4 md:p-8 flex flex-col">
           <style>
             {`
               @import url('https://fonts.googleapis.com/css2?family=Klee+One:wght@600&display=swap');
@@ -429,7 +533,6 @@
       );
     }
 
-    // アプリを画面に表示する処理
     const root = createRoot(document.getElementById('root'));
     root.render(<App />);
   </script>
